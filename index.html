@@ -3,25 +3,51 @@
 	<head>
 		<title>Snake!!!</title>
 		<script type="text/javascript">
-var gameWidth = 10;
-var gameHeight = 10;
+var gameWidth = 20;
+var gameHeight = 20;
 var speed = 100;
-var barrier = false;
+var barrier = true;
 
-//initialize
+//Initialize
+var url = window.location.href;
+var param = url.slice(url.indexOf("?") + 1).split("&");
+for(var para = 0; para < param.length; para++) {
+	if(param[para].split("=")[0] == "gameWidth") gameWidth = param[para].split("=")[1];
+	else if(param[para].split("=")[0] == "gameHeight") gameHeight = param[para].split("=")[1];
+	else if(param[para].split("=")[0] == "speed") speed = param[para].split("=")[1];
+	else if(param[para].split("=")[0] == "barrier") barrier = param[para].split("=")[1] == "true";
+}
+
+//Write
+document.write("<div></div>");
+document.body.style.margin = "0px";
+document.body.style.border = "0px";
 var mid = "i" + parseInt(gameHeight / 2) + "j" + parseInt(gameWidth / 2);
-document.write("<table style=\"align:center;margin:0px auto;border:0px;border-spacing:0px;\">");
+if(document.body.clientWidth >= document.body.clientHeight) {
+	var blockLength = parseInt((window.screen.availHeight - 108) / gameHeight);
+} else {
+	var blockLength = parseInt(window.screen.availWidth / gameWidth);
+}
+document.write("<table style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
 for(var i = 0; i < gameHeight; i++) {
 	document.write("<tr id=\"i" + i + "\">");
 	for(var j = 0; j < gameWidth; j++) {
-		document.write("<td width=\"10px\" height=\"10px\"id=\"i" + i + "j" + j + "\" style=\"background:#000\"></td>");
+		document.write("<td width=\"" + blockLength + "px\" height=\"" + blockLength + "px\"id=\"i" + i + "j" + j + "\" style=\"background:#000;padding:0px\"></td>");
 	}
 	document.write("</tr>");
 }
 document.write("</table>");
+document.write("<p id=\"score\" style=\"margin:0px;border:0px;text-align:center;font-size:32px;\">Score: 0</p>");
 document.getElementById(mid).style.background = "#FF0";
 
-//control
+//Settings
+function settings() {
+	
+}
+document.write("<div id=\"settings\" onclick=\"settings()\" style=\"margin:0px;border:0px;\"><p>test</p></div>");
+document.getElementById("settings").style.display = "none";
+
+//Control
 var paused = false;
 var snakeDirection = "right";
 document.onkeydown = function(event){
@@ -44,12 +70,34 @@ document.onkeydown = function(event){
 	}
 	if(e && e.keyCode == 32) { //space(pause/continue)
 		paused = !paused;
-		if(paused) clearTimeout(timeout);
-		else snakeMove();
+		if(paused) {
+			clearTimeout(timeout);
+			document.getElementById("settings").style.display = "inline";
+		} else {
+			document.getElementById("settings").style.display = "none";
+			if(!isAlive) {
+				clearTimeout(timeout);
+				isAlive = true;
+				score = 0;
+				snake = [mid];
+				foodLocation = [];
+				currentLocation = [
+				parseInt(gameHeight / 2),
+				parseInt(gameWidth / 2)
+				];
+				prevDirection = "";
+				for(var i = 0; i < gameHeight; i++)
+					for(var j = 0; j < gameWidth; j++)
+						document.getElementById("i" + i + "j" + j).style.background = "#000";
+				document.getElementById("score").innerHTML = "Score: 0";
+				generate();
+			}
+			snakeMove();
+		}
 	}
 }; 
 
-//game
+//Game
 var snake = [mid];//first=tail last=head
 var foodLocation = [];
 var currentLocation = [
@@ -59,6 +107,7 @@ parseInt(gameWidth / 2)	//column  currentLocation[1]
 var prevDirection;
 var timeout;
 var score = 0;
+var isAlive = true;
 function generate() {
 	while(true) {
 		foodLocation[0] = parseInt(Math.random() * gameHeight);
@@ -68,48 +117,60 @@ function generate() {
 	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = "#F00";
 }
 function snakeMove() {
-	switch(snakeDirection) {
-		case "left":
-			currentLocation[1]--;
-			break;
-		case "up":
-			currentLocation[0]--;
-			break;
-		case "right":
-			currentLocation[1]++;
-			break;
-		case "down":
-			currentLocation[0]++;
-			break;
-		default:
-			window.alert("An error has ocurred. (snakeDirection unavailable)");
-			window.location.reload();
-	}
-	if(currentLocation[0] < 0 || currentLocation[0] >= gameHeight || currentLocation[1] < 0 || currentLocation[1] >= gameWidth) {
-		if(barrier) {
-			window.alert("You crashed into the wall!\nScore: " + score);
-			window.location.reload();
-		} else {
-			if(currentLocation[0] < 0) currentLocation[0] += gameHeight;
-			if(currentLocation[0] >= gameHeight) currentLocation[0] -= gameHeight;
-			if(currentLocation[1] < 0) currentLocation[1] += gameWidth;
-			if(currentLocation[1] >= gameWidth) currentLocation[1] -= gameWidth;
+	if(isAlive) {
+		switch(snakeDirection) {
+			case "left":
+				currentLocation[1]--;
+				break;
+			case "up":
+				currentLocation[0]--;
+				break;
+			case "right":
+				currentLocation[1]++;
+				break;
+			case "down":
+				currentLocation[0]++;
+				break;
+		}
+		if(currentLocation[0] < 0 || currentLocation[0] >= gameHeight || currentLocation[1] < 0 || currentLocation[1] >= gameWidth) {
+			if(barrier) {
+				isAlive = false;
+				paused = true;
+				document.getElementById("settings").style.display = "inline";
+			} else {
+				if(currentLocation[0] < 0) currentLocation[0] += gameHeight;
+				if(currentLocation[0] >= gameHeight) currentLocation[0] -= gameHeight;
+				if(currentLocation[1] < 0) currentLocation[1] += gameWidth;
+				if(currentLocation[1] >= gameWidth) currentLocation[1] -= gameWidth;
+			}
+		}
+		snake.push("i" + currentLocation[0] + "j" + currentLocation[1]);
+		if(isAlive) {
+			if(!(currentLocation[0] == foodLocation[0] && currentLocation[1] == foodLocation[1])) {
+				document.getElementById(snake[0]).style.background = "#000";
+				snake.shift();
+			} else {
+				generate();
+				score++;
+				document.getElementById("score").innerHTML = "Score: " + score;
+			}
+		}
+		if(document.getElementById(snake[snake.length - 1]) != null)
+			document.getElementById(snake[snake.length - 1]).style.background = "#FF0";
+		if(snake.slice(0, snake.length - 1).includes("i" + currentLocation[0] + "j" + currentLocation[1]) && snake) {
+			isAlive = false;
+			paused = true;
+			document.getElementById("settings").style.display = "inline";
+		}
+		prevDirection = snakeDirection;
+	} else {
+		for(var index = 0; index < snake.length - 1; index++) {
+			if(document.getElementById(snake[index]).style.background == "rgb(255, 255, 0)")
+				document.getElementById(snake[index]).style.background = "#000";
+			else
+				document.getElementById(snake[index]).style.background = "#FF0";
 		}
 	}
-	if(snake.includes("i" + currentLocation[0] + "j" + currentLocation[1])) {
-		window.alert("You crashed into yourself!\nScore: " + score);
-		window.location.reload();
-	}
-	snake.push("i" + currentLocation[0] + "j" + currentLocation[1]);
-	document.getElementById(snake[snake.length - 1]).style.background = "#FF0";
-	if(!(currentLocation[0] == foodLocation[0] && currentLocation[1] == foodLocation[1])) {
-		document.getElementById(snake[0]).style.background = "#000";
-		snake.shift();
-	} else {
-		generate();
-		score++;
-	}
-	prevDirection = snakeDirection;
 	timeout = setTimeout(function(){snakeMove()}, speed);
 }
 

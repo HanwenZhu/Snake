@@ -104,51 +104,66 @@ document.getElementById("settings").style.display = "none";
 
 //Control
 var paused = false;
+function SLeft() { //left
+	if(prevDirection != "right" && !paused)
+		snakeDirection = "left";
+}
+function SUp() { //up
+	if(prevDirection != "down" && !paused)
+		snakeDirection = "up";
+}
+function SRight() { //right
+	if(prevDirection != "left" && !paused)
+		snakeDirection = "right";
+}
+function SDown() { //down
+	if(prevDirection != "up" && !paused)
+		snakeDirection = "down";
+}
+function SPause() { //pause/continue
+	paused = !paused;
+	if(paused) {
+		clearTimeout(timeout);
+		document.getElementById("settings").style.display = "inline";
+	} else {
+		document.getElementById("settings").style.display = "none";
+		if(!isAlive) {
+			clearTimeout(timeout);
+			isAlive = true;
+			score = 0;
+			snake = [mid];
+			foodLocation = [];
+			currentLocation = [
+			parseInt(gameHeight / 2),
+			parseInt(gameWidth / 2)
+			];
+			prevDirection = "";
+			for(var i = 0; i < gameHeight; i++)
+				for(var j = 0; j < gameWidth; j++)
+					document.getElementById("i" + i + "j" + j).style.background = "#000";
+			document.getElementById("score").innerHTML = "Score: 0";
+			generate();
+		}
+		snakeMove();
+	}
+}
 var snakeDirection = "right";
-document.onkeydown = function(event){
+document.onkeydown = function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	if(e && e.keyCode == 37) { //left
-		if(prevDirection != "right")
-			snakeDirection = "left";
+		SLeft();
 	}
 	if(e && e.keyCode == 38) { //up
-		if(prevDirection != "down")
-			snakeDirection = "up";
+		SUp();
 	}      
 	if(e && e.keyCode == 39) { //right
-		if(prevDirection != "left")
-			snakeDirection = "right";
+		SRight();
 	}
 	if(e && e.keyCode == 40) { //down
-		if(prevDirection != "up")
-			snakeDirection = "down";
+		SDown();
 	}
 	if(e && e.keyCode == 32) { //space(pause/continue)
-		paused = !paused;
-		if(paused) {
-			clearTimeout(timeout);
-			document.getElementById("settings").style.display = "inline";
-		} else {
-			document.getElementById("settings").style.display = "none";
-			if(!isAlive) {
-				clearTimeout(timeout);
-				isAlive = true;
-				score = 0;
-				snake = [mid];
-				foodLocation = [];
-				currentLocation = [
-				parseInt(gameHeight / 2),
-				parseInt(gameWidth / 2)
-				];
-				prevDirection = "";
-				for(var i = 0; i < gameHeight; i++)
-					for(var j = 0; j < gameWidth; j++)
-						document.getElementById("i" + i + "j" + j).style.background = "#000";
-				document.getElementById("score").innerHTML = "Score: 0";
-				generate();
-			}
-			snakeMove();
-		}
+		SPause();
 	}
 }; 
 
@@ -164,13 +179,18 @@ var timeout;
 var score = 0;
 var isAlive = true;
 function generate() {
+	alert("generate start");
 	foodLocation[0] = parseInt(Math.random() * gameHeight);
 	foodLocation[1] = parseInt(Math.random() * gameWidth);
+	alert("foodLocation");
 	if(snake.includes("i" + foodLocation[0] + "j" + foodLocation[1])) {
+		alert("in snake");
 		generate();
 		return;
 	}
+	alert("not in snake");
 	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = "#F00";
+	alert("generate end");
 }
 function snakeMove() {
 	if(isAlive) {

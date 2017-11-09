@@ -103,7 +103,6 @@ if(document.getElementById("barrier") != null)
 document.getElementById("settings").style.display = "none";
 
 //Control
-window.alert("106");
 var paused = false;
 var snakeDirection = "right";
 document.onkeydown = function(event){
@@ -154,7 +153,6 @@ document.onkeydown = function(event){
 }; 
 
 //Game
-window.alert("157");
 var snake = [mid];//first=tail last=head
 var foodLocation = [];
 var currentLocation = [
@@ -166,10 +164,11 @@ var timeout;
 var score = 0;
 var isAlive = true;
 function generate() {
-	while(true) {
-		foodLocation[0] = parseInt(Math.random() * gameHeight);
-		foodLocation[1] = parseInt(Math.random() * gameWidth);
-		if(!snake.includes("i" + foodLocation[0] + "j" + foodLocation[1])) break;
+	foodLocation[0] = parseInt(Math.random() * gameHeight);
+	foodLocation[1] = parseInt(Math.random() * gameWidth);
+	if(!snake.includes("i" + foodLocation[0] + "j" + foodLocation[1])) {
+		generate();
+		return;
 	}
 	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = "#F00";
 }
@@ -231,7 +230,6 @@ function snakeMove() {
 	timeout = setTimeout(function(){snakeMove()}, speed);
 }
 
-window.alert("234");
 generate();
 snakeMove();
 		</script>

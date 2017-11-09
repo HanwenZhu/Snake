@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Snake!!!</title>
 		<script type="text/javascript">
 var gameWidth = 20;
 var gameHeight = 20;
@@ -12,21 +11,38 @@ var barrier = true;
 var url = window.location.href;
 var param = url.slice(url.indexOf("?") + 1).split("&");
 for(var para = 0; para < param.length; para++) {
-	if(param[para].split("=")[0] == "gameWidth") gameWidth = param[para].split("=")[1];
-	else if(param[para].split("=")[0] == "gameHeight") gameHeight = param[para].split("=")[1];
-	else if(param[para].split("=")[0] == "speed") speed = param[para].split("=")[1];
-	else if(param[para].split("=")[0] == "barrier") barrier = param[para].split("=")[1] == "true";
+	switch(param[para].split("=")[0]) {
+		case "gameWidth":
+			gameWidth = param[para].split("=")[1];
+			break;
+		case "gameHeight":
+			gameHeight = param[para].split("=")[1];
+			break;
+		case "speed":
+			speed = param[para].split("=")[1];
+			break;
+		case "barrier":
+			barrier = param[para].split("=")[1] == "true";
+			break;
+	}
 }
 
 //Write
+document.title = "Snake - icreiuheciijc";
 document.write("<div></div>");
 document.body.style.margin = "0px";
 document.body.style.border = "0px";
+document.body.style.position = "absolute";
+document.body.style.top = "0px";
+document.body.style.right = "0px";
+document.body.style.bottom = "0px";
+document.body.style.left = "0px";
 var mid = "i" + parseInt(gameHeight / 2) + "j" + parseInt(gameWidth / 2);
 if(document.body.clientWidth >= document.body.clientHeight) {
-	var blockLength = parseInt((window.screen.availHeight - 108) / gameHeight);
+	var blockLength = parseInt((document.body.clientHeight - 42) / gameHeight);
 } else {
-	var blockLength = parseInt(window.screen.availWidth / gameWidth);
+	var blockLength = parseInt(document.body.clientWidth / gameWidth);
+	document.write("<h1 style=\"margin:0px;border:0px;text-align:center;\">Snake</h1>");
 }
 document.write("<table style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
 for(var i = 0; i < gameHeight; i++) {
@@ -41,13 +57,53 @@ document.write("<p id=\"score\" style=\"margin:0px;border:0px;text-align:center;
 document.getElementById(mid).style.background = "#FF0";
 
 //Settings
+//gameWidth, gameHeight, speed, barrier
+document.write("<div id=\"settings\" style=\"margin:0px;border:0px;\"><hr /><center>Game Width: <input id=\"width\" type=\"text\" placeholder=\"Game Width(2~256)\" value=\"" + gameWidth + "\" /> Game Height: <input id=\"height\" type=\"text\" placeholder=\"Game Height(2~256)\" value=\"" + gameHeight + "\" /><br /><select id=\"speed\"><option>--Select speed--</option><option value=\"10\">Extreme</option><option value=\"50\">Fast</option><option value=\"100\">Medium</option><option value=\"300\">Slow</option><option value=\"800\">Beginner</option> <input id=\"barrier\" type=\"checkbox\" value=\"barrier\" />Death by crash into wall <input type=\"button\" onclick=\"settings()\" value=\"Go!\" /></center></div>");
 function settings() {
-	
+	function widthError() {
+		document.getElementById("width").style.background = "#FAA";
+		setTimeout(function(){document.getElementById("width").style.background = "#FFF";}, 2000);
+	}
+	function heightError() {
+		document.getElementById("height").style.background = "#FAA";
+		setTimeout(function(){document.getElementById("height").style.background = "#FFF";}, 2000);
+	}
+	function speedError() {
+		document.getElementById("speed").style.background = "#FAA";
+		setTimeout(function(){document.getElementById("speed").style.background = "#FFF";}, 2000);
+	}
+	var getWidth = document.getElementById("width").value, getHeight = document.getElementById("height").value, getSpeed = document.getElementById("speed").value, getBarrier = document.getElementById("barrier").checked;
+	if(isNaN(getWidth) || getWidth.includes(".")) {
+		widthError();
+		return;
+	}
+	if(isNaN(getHeight) || getHeight.includes(".")) {
+		heightError();
+		return;
+	}
+	if(isNaN(getSpeed)) {
+		speedError();
+		return;
+	}
+	if(parseInt(getWidth) < 2 || parseInt(getWidth) > 256) {
+		widthError();
+		return;
+	}
+	if(parseInt(getHeight) < 2 || parseInt(getWidth) > 256) {
+		heightError();
+		return;
+	}
+	window.location.href = url.slice(0, url.indexOf("?") + 1) + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
 }
-document.write("<div id=\"settings\" onclick=\"settings()\" style=\"margin:0px;border:0px;\"><p>test</p></div>");
+var mapSpeed = [10, 50, 100, 300, 800];
+if(document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
+	document.getElementById("speed")[mapSpeed.indexOf(speed)].selected = true;
+if(document.getElementById("barrier") != null)
+	document.getElementById("barrier").checked = barrier;
 document.getElementById("settings").style.display = "none";
 
 //Control
+window.alert("106");
 var paused = false;
 var snakeDirection = "right";
 document.onkeydown = function(event){
@@ -98,6 +154,7 @@ document.onkeydown = function(event){
 }; 
 
 //Game
+window.alert("157");
 var snake = [mid];//first=tail last=head
 var foodLocation = [];
 var currentLocation = [
@@ -174,10 +231,11 @@ function snakeMove() {
 	timeout = setTimeout(function(){snakeMove()}, speed);
 }
 
+window.alert("234");
 generate();
 snakeMove();
 		</script>
-	<body style="margin:0px;border:0px;">
+	<body>
 		
 	</body>
 </html>

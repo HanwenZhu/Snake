@@ -166,7 +166,7 @@ var isAlive = true;
 function generate() {
 	foodLocation[0] = parseInt(Math.random() * gameHeight);
 	foodLocation[1] = parseInt(Math.random() * gameWidth);
-	if(!snake.includes("i" + foodLocation[0] + "j" + foodLocation[1])) {
+	if(snake.includes("i" + foodLocation[0] + "j" + foodLocation[1])) {
 		generate();
 		return;
 	}

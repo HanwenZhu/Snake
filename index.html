@@ -44,7 +44,7 @@ if(document.body.clientWidth / gameWidth >= (document.body.clientHeight - 42) / 
 	var blockLength = parseInt(document.body.clientWidth / gameWidth);
 	document.write("<h1 style=\"margin:0px;border:0px;text-align:center;\">Snake</h1>");
 }
-document.write("<table style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
+document.write("<table border=\"0px\" cellpadding=\"0px\" cellspacing=\"0px\" style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
 for(var i = 0; i < gameHeight; i++) {
 	document.write("<tr id=\"i" + i + "\">");
 	for(var j = 0; j < gameWidth; j++) {

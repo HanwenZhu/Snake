@@ -13,13 +13,13 @@ var param = url.slice(url.indexOf("?") + 1).split("&");
 for(var para = 0; para < param.length; para++) {
 	switch(param[para].split("=")[0]) {
 		case "gameWidth":
-			gameWidth = param[para].split("=")[1];
+			gameWidth = parseInt(param[para].split("=")[1]);
 			break;
 		case "gameHeight":
-			gameHeight = param[para].split("=")[1];
+			gameHeight = parseInt(param[para].split("=")[1]);
 			break;
 		case "speed":
-			speed = param[para].split("=")[1];
+			speed = parseInt(param[para].split("=")[1]);
 			break;
 		case "barrier":
 			barrier = param[para].split("=")[1] == "true";
@@ -38,7 +38,7 @@ document.body.style.right = "0px";
 document.body.style.bottom = "0px";
 document.body.style.left = "0px";
 var mid = "i" + parseInt(gameHeight / 2) + "j" + parseInt(gameWidth / 2);
-if(document.body.clientWidth >= document.body.clientHeight) {
+if(document.body.clientWidth / gameWidth >= (document.body.clientHeight - 42) / gameHeight) {
 	var blockLength = parseInt((document.body.clientHeight - 42) / gameHeight);
 } else {
 	var blockLength = parseInt(document.body.clientWidth / gameWidth);
@@ -73,11 +73,11 @@ function settings() {
 		setTimeout(function(){document.getElementById("speed").style.background = "#FFF";}, 2000);
 	}
 	var getWidth = document.getElementById("width").value, getHeight = document.getElementById("height").value, getSpeed = document.getElementById("speed").value, getBarrier = document.getElementById("barrier").checked;
-	if(isNaN(getWidth) || getWidth.includes(".")) {
+	if(isNaN(getWidth) || getWidth.indexOf(".") != -1) {
 		widthError();
 		return;
 	}
-	if(isNaN(getHeight) || getHeight.includes(".")) {
+	if(isNaN(getHeight) || getHeight.indexOf(".") != -1) {
 		heightError();
 		return;
 	}
@@ -93,9 +93,12 @@ function settings() {
 		heightError();
 		return;
 	}
-	window.location.href = url.slice(0, url.indexOf("?") + 1) + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
+	if(url.indexOf("?") != -1)
+		window.location.href = url.slice(0, url.indexOf("?")) + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
+	else
+		window.location.href = url + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
 }
-var mapSpeed = [10, 50, 100, 300, 800];
+var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 800];
 if(document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
 	document.getElementById("speed")[mapSpeed.indexOf(speed)].selected = true;
 if(document.getElementById("barrier") != null)
@@ -179,18 +182,13 @@ var timeout;
 var score = 0;
 var isAlive = true;
 function generate() {
-	alert("generate start");
 	foodLocation[0] = parseInt(Math.random() * gameHeight);
 	foodLocation[1] = parseInt(Math.random() * gameWidth);
-	alert("foodLocation");
-	if(snake.includes("i" + foodLocation[0] + "j" + foodLocation[1])) {
-		alert("in snake");
+	if(snake.indexOf("i" + foodLocation[0] + "j" + foodLocation[1]) != -1) {
 		generate();
 		return;
 	}
-	alert("not in snake");
 	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = "#F00";
-	alert("generate end");
 }
 function snakeMove() {
 	if(isAlive) {
@@ -233,7 +231,7 @@ function snakeMove() {
 		}
 		if(document.getElementById(snake[snake.length - 1]) != null)
 			document.getElementById(snake[snake.length - 1]).style.background = "#FF0";
-		if(snake.slice(0, snake.length - 1).includes("i" + currentLocation[0] + "j" + currentLocation[1]) && snake) {
+		if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) != -1 && snake) {
 			isAlive = false;
 			paused = true;
 			document.getElementById("settings").style.display = "inline";

@@ -2,10 +2,27 @@
 <html>
 	<head>
 		<script type="text/javascript">
+//Default settings
 var gameWidth = 20;
 var gameHeight = 20;
 var speed = 100;
 var barrier = true;
+var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
+var mapKeyCode = {
+	38: 0, //Up
+	39: 1, //Right
+	40: 2, //Down
+	37: 3, //Left
+	75: 0, //Vim up
+	76: 1, //Vim right
+	74: 2, //Vim down
+	72: 3, //Vim left
+	87: 0, //W
+	68: 1, //D
+	83: 2, //S
+	65: 3, //A
+	32: 4, //Space
+};
 
 //Initialize
 var url = window.location.href;
@@ -44,7 +61,7 @@ if(document.body.clientWidth / gameWidth >= (document.body.clientHeight - 42) / 
 	var blockLength = parseInt(document.body.clientWidth / gameWidth);
 	document.write("<h1 style=\"margin:0px;border:0px;text-align:center;\">Snake</h1>");
 }
-document.write("<table border=\"0px\" cellpadding=\"0px\" cellspacing=\"0px\" style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
+document.write("<table id=\"table\" border=\"0px\" cellpadding=\"0px\" cellspacing=\"0px\" style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
 for(var i = 0; i < gameHeight; i++) {
 	document.write("<tr id=\"i" + i + "\">");
 	for(var j = 0; j < gameWidth; j++) {
@@ -58,17 +75,19 @@ document.getElementById(mid).style.background = "#FF0";
 
 //Settings
 //gameWidth, gameHeight, speed, barrier
-document.write("<div id=\"settings\" style=\"margin:0px;border:0px;\"><hr /><center>Game Width: <input id=\"width\" type=\"text\" placeholder=\"Game Width(2~256)\" value=\"" + gameWidth + "\" /> Game Height: <input id=\"height\" type=\"text\" placeholder=\"Game Height(2~256)\" value=\"" + gameHeight + "\" /><br /><select id=\"speed\"><option>--Select speed--</option><option value=\"10\">Extreme</option><option value=\"50\">Fast</option><option value=\"100\">Medium</option><option value=\"300\">Slow</option><option value=\"800\">Beginner</option> <input id=\"barrier\" type=\"checkbox\" value=\"barrier\" />Death by crash into wall <input type=\"button\" onclick=\"settings()\" value=\"Go!\" /></center></div>");
-function settings() {
-	function widthError() {
+//Defined at start of javascript:
+//var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
+document.write("<div id=\"settings\" style=\"margin:0px;border:0px;\"><hr /><center>Game Width: <input id=\"width\" type=\"text\" placeholder=\"Game Width(2~256)\" value=\"" + gameWidth + "\" /> Game Height: <input id=\"height\" type=\"text\" placeholder=\"Game Height(2~256)\" value=\"" + gameHeight + "\" /><br /><select id=\"speed\"><option>" + mapSpeed[0] + "</option><option value=\"" + mapSpeed[1] + "\">Extreme</option><option value=\"" + mapSpeed[2] + "\">Fast</option><option value=\"" + mapSpeed[3] + "\">Medium</option><option value=\"" + mapSpeed[4] + "\">Slow</option><option value=\"" + mapSpeed[5] + "\">Beginner</option> <input id=\"barrier\" type=\"checkbox\" value=\"barrier\" />Death by crash into wall <input type=\"button\" onclick=\"settings()\" value=\"Go!\" /></center></div>");
+var settings = function() {
+	var widthError = function() {
 		document.getElementById("width").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("width").style.background = "#FFF";}, 2000);
 	}
-	function heightError() {
+	var heightError = function() {
 		document.getElementById("height").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("height").style.background = "#FFF";}, 2000);
 	}
-	function speedError() {
+	var speedError = function() {
 		document.getElementById("speed").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("speed").style.background = "#FFF";}, 2000);
 	}
@@ -98,7 +117,6 @@ function settings() {
 	else
 		window.location.href = url + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
 }
-var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 800];
 if(document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
 	document.getElementById("speed")[mapSpeed.indexOf(speed)].selected = true;
 if(document.getElementById("barrier") != null)
@@ -107,23 +125,23 @@ document.getElementById("settings").style.display = "none";
 
 //Control
 var paused = false;
-function SLeft() { //left
-	if(prevDirection != "right" && !paused)
-		snakeDirection = "left";
-}
-function SUp() { //up
+var SUp = function() { //up
 	if(prevDirection != "down" && !paused)
 		snakeDirection = "up";
 }
-function SRight() { //right
+var SRight = function() { //right
 	if(prevDirection != "left" && !paused)
 		snakeDirection = "right";
 }
-function SDown() { //down
+var SDown = function() { //down
 	if(prevDirection != "up" && !paused)
 		snakeDirection = "down";
 }
-function SPause() { //pause/continue
+var SLeft = function() { //left
+	if(prevDirection != "right" && !paused)
+		snakeDirection = "left";
+}
+var SPause = function() { //pause/continue/initialize
 	paused = !paused;
 	if(paused) {
 		clearTimeout(timeout);
@@ -140,35 +158,62 @@ function SPause() { //pause/continue
 			parseInt(gameHeight / 2),
 			parseInt(gameWidth / 2)
 			];
+			snakeDirection = "right";
 			prevDirection = "";
+			won = false;
 			for(var i = 0; i < gameHeight; i++)
 				for(var j = 0; j < gameWidth; j++)
 					document.getElementById("i" + i + "j" + j).style.background = "#000";
 			document.getElementById("score").innerHTML = "Score: 0";
 			generate();
+			document.getElementById(mid).style.background = "#FF0";
 		}
-		snakeMove();
+		timeout = setTimeout(snakeMove, speed);
 	}
 }
 var snakeDirection = "right";
-document.onkeydown = function(event) {
+document.addEventListener("keydown", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
-	if(e && e.keyCode == 37) { //left
-		SLeft();
-	}
-	if(e && e.keyCode == 38) { //up
+	if(e && mapKeyCode[e.keyCode] == 0) { //up
 		SUp();
 	}      
-	if(e && e.keyCode == 39) { //right
+	if(e && mapKeyCode[e.keyCode] == 1) { //right
 		SRight();
 	}
-	if(e && e.keyCode == 40) { //down
+	if(e && mapKeyCode[e.keyCode] == 2) { //down
 		SDown();
 	}
-	if(e && e.keyCode == 32) { //space(pause/continue)
+	if(e && mapKeyCode[e.keyCode] == 3) { //left
+		SLeft();
+	}
+	if(e && mapKeyCode[e.keyCode] == 4) { //pause/continue/initialize
 		SPause();
 	}
-}; 
+});
+var startX, startY;
+document.getElementById("table").addEventListener("touchstart", function(event) {
+	startX = event.touches[0].clientX;
+	startY = event.touches[0].clientY;
+});
+document.getElementById("table").addEventListener("touchend", function(event) {
+	var changeY = event.clientY - startY;
+	var changeX = event.clientX - startX;
+	if(changeX * changeX + changeY * changeY > 100)
+		if(changeX >= 0)
+			if(changeY >= 0)
+				if(changeX < changeY) SUp();
+				else SRight();
+			else
+				if(changeX >= -changeY) SRight();
+				else SDown();
+		else
+			if(changeY < 0)
+				if(-changeX < -changeY) SDown();
+				else SLeft();
+			else
+				if(-changeX >= changeY) SLeft();
+				else SUp();
+});
 
 //Game
 var snake = [mid];//first=tail last=head
@@ -181,7 +226,15 @@ var prevDirection;
 var timeout;
 var score = 0;
 var isAlive = true;
-function generate() {
+var won = false;
+var generate = function() {
+	if(snake.length == gameWidth * gameHeight) {
+		isAlive = false;
+		paused = true;
+		won = true;
+		document.getElementById("settings").style.display = "inline";
+		return;
+	}
 	foodLocation[0] = parseInt(Math.random() * gameHeight);
 	foodLocation[1] = parseInt(Math.random() * gameWidth);
 	if(snake.indexOf("i" + foodLocation[0] + "j" + foodLocation[1]) != -1) {
@@ -190,7 +243,7 @@ function generate() {
 	}
 	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = "#F00";
 }
-function snakeMove() {
+var snakeMove = function() {
 	if(isAlive) {
 		switch(snakeDirection) {
 			case "left":
@@ -221,8 +274,10 @@ function snakeMove() {
 		snake.push("i" + currentLocation[0] + "j" + currentLocation[1]);
 		if(isAlive) {
 			if(!(currentLocation[0] == foodLocation[0] && currentLocation[1] == foodLocation[1])) {
-				document.getElementById(snake[0]).style.background = "#000";
-				snake.shift();
+				if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) < 0) {
+					document.getElementById(snake[0]).style.background = "#000";
+					snake.shift();
+				}
 			} else {
 				generate();
 				score++;
@@ -231,25 +286,36 @@ function snakeMove() {
 		}
 		if(document.getElementById(snake[snake.length - 1]) != null)
 			document.getElementById(snake[snake.length - 1]).style.background = "#FF0";
-		if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) != -1 && snake) {
+		if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) != -1) {
 			isAlive = false;
 			paused = true;
 			document.getElementById("settings").style.display = "inline";
 		}
 		prevDirection = snakeDirection;
+		if(won) {
+			var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
+			for(var index = 0; index < snake.length; index++)
+			document.getElementById(snake[index]).style.background = colors[index % colors.length];
+		}
 	} else {
-		for(var index = 0; index < snake.length - 1; index++) {
-			if(document.getElementById(snake[index]).style.background == "rgb(255, 255, 0)")
-				document.getElementById(snake[index]).style.background = "#000";
-			else
-				document.getElementById(snake[index]).style.background = "#FF0";
+		if(!won) {
+			for(var index = 0; index < snake.length - 1; index++) {
+				if(document.getElementById(snake[index]).style.background == "rgb(255, 255, 0)")
+					document.getElementById(snake[index]).style.background = "#000";
+				else
+					document.getElementById(snake[index]).style.background = "#FF0";
+			}
+		} else {
+			var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
+			for(var index = 0; index < snake.length; index++)
+				document.getElementById(snake[index]).style.background = colors[(colors.indexOf(document.getElementById(snake[index]).style.background) + 1) % colors.length];
 		}
 	}
-	timeout = setTimeout(function(){snakeMove()}, speed);
+	timeout = setTimeout(snakeMove, speed);
 }
 
 generate();
-snakeMove();
+timeout = setTimeout(snakeMove, speed);
 		</script>
 	<body>
 		

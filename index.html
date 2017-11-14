@@ -176,28 +176,40 @@ document.addEventListener("keydown", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	if(e && mapKeyCode[e.keyCode] == 0) { //up
 		SUp();
+		e.preventDefault();
 	}      
 	if(e && mapKeyCode[e.keyCode] == 1) { //right
 		SRight();
+		e.preventDefault();
 	}
 	if(e && mapKeyCode[e.keyCode] == 2) { //down
 		SDown();
+		e.preventDefault();
 	}
 	if(e && mapKeyCode[e.keyCode] == 3) { //left
 		SLeft();
+		e.preventDefault();
 	}
 	if(e && mapKeyCode[e.keyCode] == 4) { //pause/continue/initialize
 		SPause();
+		e.preventDefault();
 	}
 });
 var startX, startY;
 document.getElementById("table").addEventListener("touchstart", function(event) {
-	startX = event.touches[0].clientX;
-	startY = event.touches[0].clientY;
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	startX = e.touches[0].clientX;
+	startY = e.touches[0].clientY;
+	e.preventDefault();
+});
+document.getElementById("table").addEventListener("touchmove", function(event) {
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	e.preventDefault();
 });
 document.getElementById("table").addEventListener("touchend", function(event) {
-	var changeY = event.clientY - startY;
-	var changeX = event.clientX - startX;
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	var changeY = e.clientY - startY;
+	var changeX = e.clientX - startX;
 	if(changeX * changeX + changeY * changeY > 100)
 		if(changeX >= 0)
 			if(changeY >= 0)
@@ -213,6 +225,7 @@ document.getElementById("table").addEventListener("touchend", function(event) {
 			else
 				if(-changeX >= changeY) SLeft();
 				else SUp();
+	e.preventDefault();
 });
 
 //Game

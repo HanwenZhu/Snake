@@ -26,7 +26,7 @@ var mapKeyCode = {
 var colorBackground = "rgb(0, 0, 0)";
 var colorSnakeBody = "rgb(255, 255, 0)";
 var colorFood = "rgb(255, 0, 0)";
-var minChange = 100; // Minimum change distance
+var minChange = 100; // (Minimum change distance)^2
 var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
 
 // Initialize
@@ -205,6 +205,8 @@ document.getElementById("table").addEventListener("touchstart", function(event) 
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	startX = e.touches[0].clientX;
 	startY = -e.touches[0].clientY;
+	changeX = 0;
+	changeY = 0;
 	e.preventDefault();
 });
 document.getElementById("table").addEventListener("touchmove", function(event) {

@@ -2,29 +2,34 @@
 <html>
 	<head>
 		<script type="text/javascript">
-//Default settings
+// Default settings
 var gameWidth = 20;
 var gameHeight = 20;
 var speed = 100;
 var barrier = true;
 var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
 var mapKeyCode = {
-	38: 0, //Up
-	39: 1, //Right
-	40: 2, //Down
-	37: 3, //Left
-	75: 0, //Vim up
-	76: 1, //Vim right
-	74: 2, //Vim down
-	72: 3, //Vim left
-	87: 0, //W
-	68: 1, //D
-	83: 2, //S
-	65: 3, //A
-	32: 4, //Space
+	38: 0, // Up
+	39: 1, // Right
+	40: 2, // Down
+	37: 3, // Left
+	75: 0, // Vim up
+	76: 1, // Vim right
+	74: 2, // Vim down
+	72: 3, // Vim left
+	87: 0, // W
+	68: 1, // D
+	83: 2, // S
+	65: 3, // A
+	32: 4, // Space
 };
+var colorBackground = "rgb(0, 0, 0)";
+var colorSnakeBody = "rgb(255, 255, 0)";
+var colorFood = "rgb(255, 0, 0)";
+var minChange = 100; // Minimum change distance
+var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
 
-//Initialize
+// Initialize
 var url = window.location.href;
 var param = url.slice(url.indexOf("?") + 1).split("&");
 for(var para = 0; para < param.length; para++) {
@@ -44,7 +49,7 @@ for(var para = 0; para < param.length; para++) {
 	}
 }
 
-//Write
+// Write
 document.title = "Snake - icreiuheciijc";
 document.write("<div></div>");
 document.body.style.margin = "0px";
@@ -65,32 +70,32 @@ document.write("<table id=\"table\" border=\"0px\" cellpadding=\"0px\" cellspaci
 for(var i = 0; i < gameHeight; i++) {
 	document.write("<tr id=\"i" + i + "\">");
 	for(var j = 0; j < gameWidth; j++) {
-		document.write("<td width=\"" + blockLength + "px\" height=\"" + blockLength + "px\"id=\"i" + i + "j" + j + "\" style=\"background:#000;padding:0px\"></td>");
+		document.write("<td width=\"" + blockLength + "px\" height=\"" + blockLength + "px\"id=\"i" + i + "j" + j + "\" style=\"background:" + colorBackground + ";padding:0px\"></td>");
 	}
 	document.write("</tr>");
 }
 document.write("</table>");
 document.write("<p id=\"score\" style=\"margin:0px;border:0px;text-align:center;font-size:32px;\">Score: 0</p>");
-document.getElementById(mid).style.background = "#FF0";
+document.getElementById(mid).style.background = colorSnakeBody;
 
-//Settings
-//gameWidth, gameHeight, speed, barrier
-//Defined at start of javascript:
-//var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
+// Settings
+// gameWidth, gameHeight, speed, barrier
+// Defined at start of javascript:
+// var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
 document.write("<div id=\"settings\" style=\"margin:0px;border:0px;\"><hr /><center>Game Width: <input id=\"width\" type=\"text\" placeholder=\"Game Width(2~256)\" value=\"" + gameWidth + "\" /> Game Height: <input id=\"height\" type=\"text\" placeholder=\"Game Height(2~256)\" value=\"" + gameHeight + "\" /><br /><select id=\"speed\"><option>" + mapSpeed[0] + "</option><option value=\"" + mapSpeed[1] + "\">Extreme</option><option value=\"" + mapSpeed[2] + "\">Fast</option><option value=\"" + mapSpeed[3] + "\">Medium</option><option value=\"" + mapSpeed[4] + "\">Slow</option><option value=\"" + mapSpeed[5] + "\">Beginner</option> <input id=\"barrier\" type=\"checkbox\" value=\"barrier\" />Death by crash into wall <input type=\"button\" onclick=\"settings()\" value=\"Go!\" /></center></div>");
 var settings = function() {
 	var widthError = function() {
 		document.getElementById("width").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("width").style.background = "#FFF";}, 2000);
-	}
+	};
 	var heightError = function() {
 		document.getElementById("height").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("height").style.background = "#FFF";}, 2000);
-	}
+	};
 	var speedError = function() {
 		document.getElementById("speed").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("speed").style.background = "#FFF";}, 2000);
-	}
+	};
 	var getWidth = document.getElementById("width").value, getHeight = document.getElementById("height").value, getSpeed = document.getElementById("speed").value, getBarrier = document.getElementById("barrier").checked;
 	if(isNaN(getWidth) || getWidth.indexOf(".") != -1) {
 		widthError();
@@ -116,32 +121,32 @@ var settings = function() {
 		window.location.href = url.slice(0, url.indexOf("?")) + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
 	else
 		window.location.href = url + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
-}
+};
 if(document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
 	document.getElementById("speed")[mapSpeed.indexOf(speed)].selected = true;
 if(document.getElementById("barrier") != null)
 	document.getElementById("barrier").checked = barrier;
 document.getElementById("settings").style.display = "none";
 
-//Control
+// Control
 var paused = false;
-var SUp = function() { //up
-	if(prevDirection != "down" && !paused)
+var SUp = function() { // up
+	if((prevDirection != "down" && prevDirection != "up") && !paused)
 		snakeDirection = "up";
-}
-var SRight = function() { //right
-	if(prevDirection != "left" && !paused)
+};
+var SRight = function() { // right
+	if((prevDirection != "left" && prevDirection != "right") && !paused)
 		snakeDirection = "right";
-}
-var SDown = function() { //down
-	if(prevDirection != "up" && !paused)
+};
+var SDown = function() { // down
+	if((prevDirection != "up" && prevDirection != "down") && !paused)
 		snakeDirection = "down";
-}
-var SLeft = function() { //left
-	if(prevDirection != "right" && !paused)
+};
+var SLeft = function() { // left
+	if((prevDirection != "right" && prevDirection != "left") && !paused)
 		snakeDirection = "left";
-}
-var SPause = function() { //pause/continue/initialize
+};
+var SPause = function() { // pause/continue/initialize
 	paused = !paused;
 	if(paused) {
 		clearTimeout(timeout);
@@ -163,54 +168,50 @@ var SPause = function() { //pause/continue/initialize
 			won = false;
 			for(var i = 0; i < gameHeight; i++)
 				for(var j = 0; j < gameWidth; j++)
-					document.getElementById("i" + i + "j" + j).style.background = "#000";
+					document.getElementById("i" + i + "j" + j).style.background = colorBackground;
 			document.getElementById("score").innerHTML = "Score: 0";
 			generate();
-			document.getElementById(mid).style.background = "#FF0";
+			document.getElementById(mid).style.background = colorSnakeBody;
 		}
 		timeout = setTimeout(snakeMove, speed);
 	}
-}
+};
 var snakeDirection = "right";
 document.addEventListener("keydown", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
-	if(e && mapKeyCode[e.keyCode] == 0) { //up
+	if(e && mapKeyCode[e.keyCode] == 0) { // up
 		SUp();
 		e.preventDefault();
 	}      
-	if(e && mapKeyCode[e.keyCode] == 1) { //right
+	if(e && mapKeyCode[e.keyCode] == 1) { // right
 		SRight();
 		e.preventDefault();
 	}
-	if(e && mapKeyCode[e.keyCode] == 2) { //down
+	if(e && mapKeyCode[e.keyCode] == 2) { // down
 		SDown();
 		e.preventDefault();
 	}
-	if(e && mapKeyCode[e.keyCode] == 3) { //left
+	if(e && mapKeyCode[e.keyCode] == 3) { // left
 		SLeft();
 		e.preventDefault();
 	}
-	if(e && mapKeyCode[e.keyCode] == 4) { //pause/continue/initialize
+	if(e && mapKeyCode[e.keyCode] == 4) { // pause/continue/initialize
 		SPause();
 		e.preventDefault();
 	}
 });
-var startX, startY;
+var startX, startY, changeX, changeY;
 document.getElementById("table").addEventListener("touchstart", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	startX = e.touches[0].clientX;
-	startY = e.touches[0].clientY;
+	startY = -e.touches[0].clientY;
 	e.preventDefault();
 });
 document.getElementById("table").addEventListener("touchmove", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
-	e.preventDefault();
-});
-document.getElementById("table").addEventListener("touchend", function(event) {
-	var e = event || window.event || arguments.callee.caller.arguments[0];
-	var changeY = e.clientY - startY;
-	var changeX = e.clientX - startX;
-	if(changeX * changeX + changeY * changeY > 100)
+	changeX = e.touches[0].clientX - startX;
+	changeY = -e.touches[0].clientY - startY;
+	if(changeX * changeX + changeY * changeY > minChange)
 		if(changeX >= 0)
 			if(changeY >= 0)
 				if(changeX < changeY) SUp();
@@ -227,13 +228,17 @@ document.getElementById("table").addEventListener("touchend", function(event) {
 				else SUp();
 	e.preventDefault();
 });
+document.getElementById("table").addEventListener("touchend", function(event) {
+	var e = event || window.event || arguments.callee.caller.arguments[0];
+	e.preventDefault();
+});
 
-//Game
-var snake = [mid];//first=tail last=head
+// Game
+var snake = [mid];// first=tail last=head
 var foodLocation = [];
 var currentLocation = [
-parseInt(gameHeight / 2), //row     currentLocation[0]
-parseInt(gameWidth / 2)	//column  currentLocation[1]
+parseInt(gameHeight / 2), // row     currentLocation[0]
+parseInt(gameWidth / 2)	// column  currentLocation[1]
 ];
 var prevDirection;
 var timeout;
@@ -254,8 +259,8 @@ var generate = function() {
 		generate();
 		return;
 	}
-	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = "#F00";
-}
+	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = colorFood;
+};
 var snakeMove = function() {
 	if(isAlive) {
 		switch(snakeDirection) {
@@ -287,8 +292,8 @@ var snakeMove = function() {
 		snake.push("i" + currentLocation[0] + "j" + currentLocation[1]);
 		if(isAlive) {
 			if(!(currentLocation[0] == foodLocation[0] && currentLocation[1] == foodLocation[1])) {
-				if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) < 0) {
-					document.getElementById(snake[0]).style.background = "#000";
+				if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) <= 0) {
+					document.getElementById(snake[0]).style.background = colorBackground;
 					snake.shift();
 				}
 			} else {
@@ -298,7 +303,7 @@ var snakeMove = function() {
 			}
 		}
 		if(document.getElementById(snake[snake.length - 1]) != null)
-			document.getElementById(snake[snake.length - 1]).style.background = "#FF0";
+			document.getElementById(snake[snake.length - 1]).style.background = colorSnakeBody;
 		if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) != -1) {
 			isAlive = false;
 			paused = true;
@@ -306,26 +311,24 @@ var snakeMove = function() {
 		}
 		prevDirection = snakeDirection;
 		if(won) {
-			var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
 			for(var index = 0; index < snake.length; index++)
 			document.getElementById(snake[index]).style.background = colors[index % colors.length];
 		}
 	} else {
 		if(!won) {
 			for(var index = 0; index < snake.length - 1; index++) {
-				if(document.getElementById(snake[index]).style.background == "rgb(255, 255, 0)")
-					document.getElementById(snake[index]).style.background = "#000";
+				if(document.getElementById(snake[index]).style.background == colorSnakeBody)
+					document.getElementById(snake[index]).style.background = colorBackground;
 				else
-					document.getElementById(snake[index]).style.background = "#FF0";
+					document.getElementById(snake[index]).style.background = colorSnakeBody;
 			}
 		} else {
-			var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
 			for(var index = 0; index < snake.length; index++)
 				document.getElementById(snake[index]).style.background = colors[(colors.indexOf(document.getElementById(snake[index]).style.background) + 1) % colors.length];
 		}
 	}
 	timeout = setTimeout(snakeMove, speed);
-}
+};
 
 generate();
 timeout = setTimeout(snakeMove, speed);

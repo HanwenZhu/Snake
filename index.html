@@ -211,7 +211,7 @@ document.getElementById("table").addEventListener("touchmove", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	changeX = e.touches[0].clientX - startX;
 	changeY = -e.touches[0].clientY - startY;
-	if(changeX * changeX + changeY * changeY > minChange) {
+	if(changeX * changeX + changeY * changeY > minChange)
 		if(changeX >= 0)
 			if(changeY >= 0)
 				if(changeX < changeY) SUp();
@@ -226,13 +226,12 @@ document.getElementById("table").addEventListener("touchmove", function(event) {
 			else
 				if(-changeX >= changeY) SLeft();
 				else SUp();
-		startX = e.touches[0].clientX;
-		startY = -e.touches[0].clientY;
-	}
 	e.preventDefault();
 });
 document.getElementById("table").addEventListener("touchend", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
+	if(changeX * changeX + changeY * changeY <= minChange)
+		SPause();
 	e.preventDefault();
 });
 

@@ -6,7 +6,7 @@
 var gameWidth = 20;
 var gameHeight = 20;
 var speed = 100;
-var barrier = true;
+var barrier = false;
 var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
 var mapKeyCode = {
 	38: 0, // Up
@@ -51,6 +51,7 @@ for(var para = 0; para < param.length; para++) {
 
 // Write
 document.title = "Snake - icreiuheciijc";
+document.head.innerHTML = "<link rel=\"icon\" type=\"image/x-icon\" href=\"favicon.ico\" />" + document.head.innerHTML;
 document.write("<div></div>");
 document.body.style.margin = "0px";
 document.body.style.border = "0px";
@@ -82,19 +83,23 @@ document.getElementById(mid).style.background = colorSnakeBody;
 // gameWidth, gameHeight, speed, barrier
 // Defined at start of javascript:
 // var mapSpeed = ["--Select speed--", 10, 50, 100, 300, 500];
-document.write("<div id=\"settings\" style=\"margin:0px;border:0px;\"><hr /><center>Game Width: <input id=\"width\" type=\"text\" placeholder=\"Game Width(2~256)\" value=\"" + gameWidth + "\" /> Game Height: <input id=\"height\" type=\"text\" placeholder=\"Game Height(2~256)\" value=\"" + gameHeight + "\" /><br /><select id=\"speed\"><option>" + mapSpeed[0] + "</option><option value=\"" + mapSpeed[1] + "\">Extreme</option><option value=\"" + mapSpeed[2] + "\">Fast</option><option value=\"" + mapSpeed[3] + "\">Medium</option><option value=\"" + mapSpeed[4] + "\">Slow</option><option value=\"" + mapSpeed[5] + "\">Beginner</option> <input id=\"barrier\" type=\"checkbox\" value=\"barrier\" />Death by crash into wall <input type=\"button\" onclick=\"settings()\" value=\"Go!\" /></center></div>");
-var settings = function() {
+document.write("<form id=\"settings\" style=\"margin:0px;border:0px;\"><hr /><center>Game Width: <input id=\"width\" type=\"text\" placeholder=\"Game Width(2~256)\" value=\"" + gameWidth + "\" name=\"gameWidth\" /> Game Height: <input id=\"height\" type=\"text\" placeholder=\"Game Height(2~256)\" value=\"" + gameHeight + "\" name=\"gameHeight\" /><br /><select id=\"speed\" name=\"speed\"><option>" + mapSpeed[0] + "</option><option value=\"" + mapSpeed[1] + "\">Extreme</option><option value=\"" + mapSpeed[2] + "\">Fast</option><option value=\"" + mapSpeed[3] + "\">Medium</option><option value=\"" + mapSpeed[4] + "\">Slow</option><option value=\"" + mapSpeed[5] + "\">Beginner</option> <input id=\"barrier\" type=\"checkbox\" value=\"" + barrier + "\" name=\"barrier\" />Death by crash into wall <input type=\"submit\" id=\"submit\" value=\"Go!\" /></center></form>");
+document.getElementById("submit").onclick = function(event) {
+	var e = event || window.event || arguments.caller.callee.arguments[0];
 	var widthError = function() {
 		document.getElementById("width").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("width").style.background = "#FFF";}, 2000);
+		e.preventDefault();
 	};
 	var heightError = function() {
 		document.getElementById("height").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("height").style.background = "#FFF";}, 2000);
+		e.preventDefault();
 	};
 	var speedError = function() {
 		document.getElementById("speed").style.background = "#FAA";
 		setTimeout(function(){document.getElementById("speed").style.background = "#FFF";}, 2000);
+		e.preventDefault();
 	};
 	var getWidth = document.getElementById("width").value, getHeight = document.getElementById("height").value, getSpeed = document.getElementById("speed").value, getBarrier = document.getElementById("barrier").checked;
 	if(isNaN(getWidth) || getWidth.indexOf(".") != -1) {
@@ -117,10 +122,6 @@ var settings = function() {
 		heightError();
 		return;
 	}
-	if(url.indexOf("?") != -1)
-		window.location.href = url.slice(0, url.indexOf("?")) + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
-	else
-		window.location.href = url + "?gameWidth=" + getWidth + "&gameHeight=" + getHeight + "&speed=" + getSpeed + "&barrier=" + getBarrier;
 };
 if(document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
 	document.getElementById("speed")[mapSpeed.indexOf(speed)].selected = true;

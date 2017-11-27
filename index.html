@@ -199,19 +199,25 @@ document.addEventListener("keydown", function(event) {
 		e.preventDefault();
 	}
 });
-var startX, startY, changeX, changeY;
+var rChangeX, rChangeY, rStartX, rStartY, startX, startY, changeX, changeY;
 document.getElementById("table").addEventListener("touchstart", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	startX = e.touches[0].clientX;
 	startY = -e.touches[0].clientY;
+	rStartX = e.touches[0].clientX;
+	rStartY = -e.touches[0].clientY;
 	changeX = 0;
 	changeY = 0;
+	rChangeX = 0;
+	rChangeY = 0;
 	e.preventDefault();
 });
 document.getElementById("table").addEventListener("touchmove", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	changeX = e.touches[0].clientX - startX;
 	changeY = -e.touches[0].clientY - startY;
+	rChangeX = e.touches[0].clientX - rStartX;
+	rChangeY = -e.touches[0].clientY - rStartY;
 	if (changeX * changeX + changeY * changeY > minChange) {
 		if (changeX >= 0)
 			if (changeY >= 0)
@@ -234,7 +240,7 @@ document.getElementById("table").addEventListener("touchmove", function(event) {
 });
 document.getElementById("table").addEventListener("touchend", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
-	if (changeX * changeX + changeY * changeY <= minChange)
+	if (rChangeX * rChangeX + rChangeY * rChangeY <= minChange)
 		SPause();
 	e.preventDefault();
 });

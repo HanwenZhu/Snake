@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>Snake - icreiuheciijc</title>
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
 		<script type="text/javascript">
 // Default settings
 var gameWidth = 20;
@@ -26,14 +28,14 @@ var mapKeyCode = {
 var colorBackground = "rgb(0, 0, 0)";
 var colorSnakeBody = "rgb(255, 255, 0)";
 var colorFood = "rgb(255, 0, 0)";
-var minChange = 100; // (Minimum change distance)^2
+var minChange = 10 * 10; // (Minimum change distance)^2
 var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
 
 // Initialize
 var url = window.location.href;
 var param = url.slice(url.indexOf("?") + 1).split("&");
-for(var para = 0; para < param.length; para++) {
-	switch(param[para].split("=")[0]) {
+for (var para = 0; para < param.length; para++) {
+	switch (param[para].split("=")[0]) {
 		case "gameWidth":
 			gameWidth = parseInt(param[para].split("=")[1]);
 			break;
@@ -50,8 +52,6 @@ for(var para = 0; para < param.length; para++) {
 }
 
 // Write
-document.title = "Snake - icreiuheciijc";
-document.head.innerHTML = "<link rel=\"icon\" type=\"image/x-icon\" href=\"favicon.ico\" />" + document.head.innerHTML;
 document.write("<div></div>");
 document.body.style.margin = "0px";
 document.body.style.border = "0px";
@@ -61,16 +61,16 @@ document.body.style.right = "0px";
 document.body.style.bottom = "0px";
 document.body.style.left = "0px";
 var mid = "i" + parseInt(gameHeight / 2) + "j" + parseInt(gameWidth / 2);
-if(document.body.clientWidth / gameWidth >= (document.body.clientHeight - 42) / gameHeight) {
+if (document.body.clientWidth / gameWidth >= (document.body.clientHeight - 42) / gameHeight) {
 	var blockLength = parseInt((document.body.clientHeight - 42) / gameHeight);
 } else {
 	var blockLength = parseInt(document.body.clientWidth / gameWidth);
 	document.write("<h1 style=\"margin:0px;border:0px;text-align:center;\">Snake</h1>");
 }
 document.write("<table id=\"table\" border=\"0px\" cellpadding=\"0px\" cellspacing=\"0px\" style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
-for(var i = 0; i < gameHeight; i++) {
+for (var i = 0; i < gameHeight; i++) {
 	document.write("<tr id=\"i" + i + "\">");
-	for(var j = 0; j < gameWidth; j++) {
+	for (var j = 0; j < gameWidth; j++) {
 		document.write("<td width=\"" + blockLength + "px\" height=\"" + blockLength + "px\"id=\"i" + i + "j" + j + "\" style=\"background:" + colorBackground + ";padding:0px\"></td>");
 	}
 	document.write("</tr>");
@@ -78,7 +78,6 @@ for(var i = 0; i < gameHeight; i++) {
 document.write("</table>");
 document.write("<p id=\"score\" style=\"margin:0px;border:0px;text-align:center;font-size:32px;\">Score: 0</p>");
 document.getElementById(mid).style.background = colorSnakeBody;
-
 // Settings
 // gameWidth, gameHeight, speed, barrier
 // Defined at start of javascript:
@@ -102,59 +101,58 @@ document.getElementById("submit").onclick = function(event) {
 		e.preventDefault();
 	};
 	var getWidth = document.getElementById("width").value, getHeight = document.getElementById("height").value, getSpeed = document.getElementById("speed").value, getBarrier = document.getElementById("barrier").checked;
-	if(isNaN(getWidth) || getWidth.indexOf(".") != -1) {
+	if (isNaN(getWidth) || getWidth.indexOf(".") != -1) {
 		widthError();
 		return;
 	}
-	if(isNaN(getHeight) || getHeight.indexOf(".") != -1) {
+	if (isNaN(getHeight) || getHeight.indexOf(".") != -1) {
 		heightError();
 		return;
 	}
-	if(isNaN(getSpeed)) {
+	if (isNaN(getSpeed)) {
 		speedError();
 		return;
 	}
-	if(parseInt(getWidth) < 2 || parseInt(getWidth) > 256) {
+	if (parseInt(getWidth) < 2 || parseInt(getWidth) > 256) {
 		widthError();
 		return;
 	}
-	if(parseInt(getHeight) < 2 || parseInt(getWidth) > 256) {
+	if (parseInt(getHeight) < 2 || parseInt(getWidth) > 256) {
 		heightError();
 		return;
 	}
 };
-if(document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
+if (document.getElementById("speed")[mapSpeed.indexOf(speed)] != null)
 	document.getElementById("speed")[mapSpeed.indexOf(speed)].selected = true;
-if(document.getElementById("barrier") != null)
+if (document.getElementById("barrier") != null)
 	document.getElementById("barrier").checked = barrier;
 document.getElementById("settings").style.display = "none";
-
 // Control
 var paused = false;
 var SUp = function() { // up
-	if((prevDirection != "down" && prevDirection != "up") && !paused)
+	if ((prevDirection != "down" && prevDirection != "up") && !paused)
 		snakeDirection = "up";
 };
 var SRight = function() { // right
-	if((prevDirection != "left" && prevDirection != "right") && !paused)
+	if ((prevDirection != "left" && prevDirection != "right") && !paused)
 		snakeDirection = "right";
 };
 var SDown = function() { // down
-	if((prevDirection != "up" && prevDirection != "down") && !paused)
+	if ((prevDirection != "up" && prevDirection != "down") && !paused)
 		snakeDirection = "down";
 };
 var SLeft = function() { // left
-	if((prevDirection != "right" && prevDirection != "left") && !paused)
+	if ((prevDirection != "right" && prevDirection != "left") && !paused)
 		snakeDirection = "left";
 };
 var SPause = function() { // pause/continue/initialize
 	paused = !paused;
-	if(paused) {
+	if (paused) {
 		clearTimeout(timeout);
 		document.getElementById("settings").style.display = "inline";
 	} else {
 		document.getElementById("settings").style.display = "none";
-		if(!isAlive) {
+		if (!isAlive) {
 			clearTimeout(timeout);
 			isAlive = true;
 			score = 0;
@@ -167,8 +165,8 @@ var SPause = function() { // pause/continue/initialize
 			snakeDirection = "right";
 			prevDirection = "";
 			won = false;
-			for(var i = 0; i < gameHeight; i++)
-				for(var j = 0; j < gameWidth; j++)
+			for (var i = 0; i < gameHeight; i++)
+				for (var j = 0; j < gameWidth; j++)
 					document.getElementById("i" + i + "j" + j).style.background = colorBackground;
 			document.getElementById("score").innerHTML = "Score: 0";
 			generate();
@@ -180,23 +178,23 @@ var SPause = function() { // pause/continue/initialize
 var snakeDirection = "right";
 document.addEventListener("keydown", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
-	if(e && mapKeyCode[e.keyCode] == 0) { // up
+	if (e && mapKeyCode[e.keyCode] == 0) { // up
 		SUp();
 		e.preventDefault();
 	}      
-	if(e && mapKeyCode[e.keyCode] == 1) { // right
+	if (e && mapKeyCode[e.keyCode] == 1) { // right
 		SRight();
 		e.preventDefault();
 	}
-	if(e && mapKeyCode[e.keyCode] == 2) { // down
+	if (e && mapKeyCode[e.keyCode] == 2) { // down
 		SDown();
 		e.preventDefault();
 	}
-	if(e && mapKeyCode[e.keyCode] == 3) { // left
+	if (e && mapKeyCode[e.keyCode] == 3) { // left
 		SLeft();
 		e.preventDefault();
 	}
-	if(e && mapKeyCode[e.keyCode] == 4) { // pause/continue/initialize
+	if (e && mapKeyCode[e.keyCode] == 4) { // pause/continue/initialize
 		SPause();
 		e.preventDefault();
 	}
@@ -214,30 +212,34 @@ document.getElementById("table").addEventListener("touchmove", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
 	changeX = e.touches[0].clientX - startX;
 	changeY = -e.touches[0].clientY - startY;
-	if(changeX * changeX + changeY * changeY > minChange)
-		if(changeX >= 0)
-			if(changeY >= 0)
-				if(changeX < changeY) SUp();
+	if (changeX * changeX + changeY * changeY > minChange) {
+		if (changeX >= 0)
+			if (changeY >= 0)
+				if (changeX < changeY) SUp();
 				else SRight();
 			else
-				if(changeX >= -changeY) SRight();
+				if (changeX >= -changeY) SRight();
 				else SDown();
 		else
-			if(changeY < 0)
-				if(-changeX < -changeY) SDown();
+			if (changeY < 0)
+				if (-changeX < -changeY) SDown();
 				else SLeft();
 			else
-				if(-changeX >= changeY) SLeft();
+				if (-changeX >= changeY) SLeft();
 				else SUp();
+		startX = e.touches[0].clientX;
+		startY = -e.touches[0].clientY;
+		changeX = 0;
+		changeY = 0;
+	}
 	e.preventDefault();
 });
 document.getElementById("table").addEventListener("touchend", function(event) {
 	var e = event || window.event || arguments.callee.caller.arguments[0];
-	if(changeX * changeX + changeY * changeY <= minChange)
+	if (changeX * changeX + changeY * changeY <= minChange)
 		SPause();
 	e.preventDefault();
 });
-
 // Game
 var snake = [mid];// first=tail last=head
 var foodLocation = [];
@@ -251,7 +253,7 @@ var score = 0;
 var isAlive = true;
 var won = false;
 var generate = function() {
-	if(snake.length == gameWidth * gameHeight) {
+	if (snake.length == gameWidth * gameHeight) {
 		isAlive = false;
 		paused = true;
 		won = true;
@@ -260,15 +262,15 @@ var generate = function() {
 	}
 	foodLocation[0] = parseInt(Math.random() * gameHeight);
 	foodLocation[1] = parseInt(Math.random() * gameWidth);
-	if(snake.indexOf("i" + foodLocation[0] + "j" + foodLocation[1]) != -1) {
+	if (snake.indexOf("i" + foodLocation[0] + "j" + foodLocation[1]) != -1) {
 		generate();
 		return;
 	}
 	document.getElementById("i" + foodLocation[0] + "j" + foodLocation[1]).style.background = colorFood;
 };
 var snakeMove = function() {
-	if(isAlive) {
-		switch(snakeDirection) {
+	if (isAlive) {
+		switch (snakeDirection) {
 			case "left":
 				currentLocation[1]--;
 				break;
@@ -282,22 +284,22 @@ var snakeMove = function() {
 				currentLocation[0]++;
 				break;
 		}
-		if(currentLocation[0] < 0 || currentLocation[0] >= gameHeight || currentLocation[1] < 0 || currentLocation[1] >= gameWidth) {
-			if(barrier) {
+		if (currentLocation[0] < 0 || currentLocation[0] >= gameHeight || currentLocation[1] < 0 || currentLocation[1] >= gameWidth) {
+			if (barrier) {
 				isAlive = false;
 				paused = true;
 				document.getElementById("settings").style.display = "inline";
 			} else {
-				if(currentLocation[0] < 0) currentLocation[0] += gameHeight;
-				if(currentLocation[0] >= gameHeight) currentLocation[0] -= gameHeight;
-				if(currentLocation[1] < 0) currentLocation[1] += gameWidth;
-				if(currentLocation[1] >= gameWidth) currentLocation[1] -= gameWidth;
+				if (currentLocation[0] < 0) currentLocation[0] += gameHeight;
+				if (currentLocation[0] >= gameHeight) currentLocation[0] -= gameHeight;
+				if (currentLocation[1] < 0) currentLocation[1] += gameWidth;
+				if (currentLocation[1] >= gameWidth) currentLocation[1] -= gameWidth;
 			}
 		}
 		snake.push("i" + currentLocation[0] + "j" + currentLocation[1]);
-		if(isAlive) {
-			if(!(currentLocation[0] == foodLocation[0] && currentLocation[1] == foodLocation[1])) {
-				if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) <= 0) {
+		if (isAlive) {
+			if (!(currentLocation[0] == foodLocation[0] && currentLocation[1] == foodLocation[1])) {
+				if (snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) <= 0) {
 					document.getElementById(snake[0]).style.background = colorBackground;
 					snake.shift();
 				}
@@ -307,38 +309,37 @@ var snakeMove = function() {
 				document.getElementById("score").innerHTML = "Score: " + score;
 			}
 		}
-		if(document.getElementById(snake[snake.length - 1]) != null)
+		if (document.getElementById(snake[snake.length - 1]) != null)
 			document.getElementById(snake[snake.length - 1]).style.background = colorSnakeBody;
-		if(snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) != -1) {
+		if (snake.slice(0, snake.length - 1).indexOf("i" + currentLocation[0] + "j" + currentLocation[1]) != -1) {
 			isAlive = false;
 			paused = true;
 			document.getElementById("settings").style.display = "inline";
 		}
 		prevDirection = snakeDirection;
-		if(won) {
-			for(var index = 0; index < snake.length; index++)
+		if (won) {
+			for (var index = 0; index < snake.length; index++)
 			document.getElementById(snake[index]).style.background = colors[index % colors.length];
 		}
 	} else {
-		if(!won) {
-			for(var index = 0; index < snake.length - 1; index++) {
-				if(document.getElementById(snake[index]).style.background == colorSnakeBody)
+		if (!won) {
+			for (var index = 0; index < snake.length - 1; index++) {
+				if (document.getElementById(snake[index]).style.background == colorSnakeBody)
 					document.getElementById(snake[index]).style.background = colorBackground;
 				else
 					document.getElementById(snake[index]).style.background = colorSnakeBody;
 			}
 		} else {
-			for(var index = 0; index < snake.length; index++)
+			for (var index = 0; index < snake.length; index++)
 				document.getElementById(snake[index]).style.background = colors[(colors.indexOf(document.getElementById(snake[index]).style.background) + 1) % colors.length];
 		}
 	}
 	timeout = setTimeout(snakeMove, speed);
 };
-
 generate();
 timeout = setTimeout(snakeMove, speed);
 		</script>
 	<body>
-		
+		<noscript><h1>Please enable JavaScript</h1></noscript>
 	</body>
 </html>

@@ -30,7 +30,6 @@ var colorSnakeBody = "rgb(255, 255, 0)";
 var colorFood = "rgb(255, 0, 0)";
 var minChange = 10 * 10; // (Minimum change distance)^2
 var colors = ["rgb(255, 0, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)", "rgb(0, 255, 255)", "rgb(0, 0, 255)", "rgb(255, 0, 255)"];
-
 // Initialize
 var url = window.location.href;
 var param = url.slice(url.indexOf("?") + 1).split("&");
@@ -46,11 +45,10 @@ for (var para = 0; para < param.length; para++) {
 			speed = parseInt(param[para].split("=")[1]);
 			break;
 		case "barrier":
-			barrier = param[para].split("=")[1] == "true";
+			barrier = param[para].split("=")[1] == "on";
 			break;
 	}
 }
-
 // Write
 document.write("<div></div>");
 document.body.style.margin = "0px";
@@ -62,9 +60,9 @@ document.body.style.bottom = "0px";
 document.body.style.left = "0px";
 var mid = "i" + parseInt(gameHeight / 2) + "j" + parseInt(gameWidth / 2);
 if (document.body.clientWidth / gameWidth >= (document.body.clientHeight - 42) / gameHeight) {
-	var blockLength = parseInt((document.body.clientHeight - 42) / gameHeight);
+	var blockLength = (document.body.clientHeight - 42) / gameHeight;
 } else {
-	var blockLength = parseInt(document.body.clientWidth / gameWidth);
+	var blockLength = document.body.clientWidth / gameWidth;
 	document.write("<h1 style=\"margin:0px;border:0px;text-align:center;\">Snake</h1>");
 }
 document.write("<table id=\"table\" border=\"0px\" cellpadding=\"0px\" cellspacing=\"0px\" style=\"margin:0px auto;border:0px;border-spacing:0px;\">");
